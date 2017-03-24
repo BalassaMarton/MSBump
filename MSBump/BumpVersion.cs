@@ -97,7 +97,7 @@ namespace MSBump
 
         public string Label { get; set; }
 
-        public string LabelAction { get; set; }
+        public string LabelAction { get; set; } = "Increment";
 
         public int LabelDigits { get; set; } = 6;
     }
