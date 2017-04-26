@@ -4,7 +4,8 @@
         <!-- Required elements-->
         <id>MSBump</id>
         <version>2.0.0</version>
-        <title>MSBuild task that bumps the version of a Visual Studio 2017 project.</title>
+        <title>MSBump</title>
+        <summary>MSBuild task that bumps the version of a Visual Studio 2017 project.</summary>
         <description>
           I'm working on a lot of packages that are referencing each other, but they are in different solutions.
           To make my project references maintainable, I use a local NuGet feed, and reference my projects as NuGet packages.
