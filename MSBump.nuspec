@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <!-- Required elements-->
+        <id>MSBump</id>
+        <version>2.0.0</version>
+        <title>MSBuild task that bumps the version of a Visual Studio 2017 project.</title>
+        <description>
+          I'm working on a lot of packages that are referencing each other, but they are in different solutions.
+          To make my project references maintainable, I use a local NuGet feed, and reference my projects as NuGet packages.
+          However, in this setup, I'd have to manually change the version every time I change something in a package
+          that is referenced by other solutions, to make NuGet pull the updates. This task will increment any given
+          part of the project version.
+        </description>
+        <authors>BalassaMarton</authors>
+        <projectUrl>https://github.com/BalassaMarton/MSBump</projectUrl>
+        <tags>msbuild bump package version</tags>
+        <developmentDependency>true</developmentDependency>
+    </metadata>
+    <files>
+      <file src="MSBump\bin\Release\*.dll" target="tools\MSBump"/>
+      <file src="MSBump\build\*.*" target="build"/>
+    </files>
+</package>

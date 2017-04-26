@@ -12,18 +12,11 @@ namespace MSBump
 {
     public class BumpVersion : Task
     {
-        private int Bump(int oldValue, string action)
+        private int Bump(int oldValue, bool bump)
         {
-            if (string.IsNullOrEmpty(action))
+            if (!bump)
                 return oldValue;
-            action = action.ToUpper();
-            switch (action)
-            {
-                case "INCREMENT":
-                case "+":
-                    return oldValue + 1;
-            }
-            throw new ArgumentException($"{action} is not a valid action for {GetType().Name}");
+            return oldValue + 1;
         }
         public override bool Execute()
         {
@@ -32,7 +25,7 @@ namespace MSBump
             if (xversion == null)
             {
                 BuildEngine.LogMessageEvent(new BuildMessageEventArgs($"Version property not found in {ProjectPath}", null, GetType().Name, MessageImportance.High));
-                return false;
+                return true;
             }
             BuildEngine.LogMessageEvent(new BuildMessageEventArgs($"Old version is {xversion.Value}", null, GetType().Name, MessageImportance.Low));
             var version = new NuGetVersion(xversion.Value);
@@ -46,7 +39,7 @@ namespace MSBump
             minor = Bump(minor, Minor);
             patch = Bump(patch, Patch);
             revision = Bump(revision, Revision);
-            if (!string.IsNullOrEmpty(Label) && !string.IsNullOrEmpty(LabelAction))
+            if (!string.IsNullOrEmpty(Label))
             {
                 if (!Label.All(Char.IsLetterOrDigit))
                 {
@@ -60,7 +53,7 @@ namespace MSBump
                     var match = regex.Match(label);
                     if (match.Success)
                     {
-                        var value = Bump(int.Parse(match.Groups[1].Value), LabelAction);
+                        var value = int.Parse(match.Groups[1].Value) + 1;
                         idx = labels.IndexOf(label);
                         labels[idx] = Label + value.ToString(new string('0', LabelDigits));
                         break;
@@ -87,17 +80,15 @@ namespace MSBump
         [Required]
         public string ProjectPath { get; set; }
 
-        public string Major { get; set; }
+        public bool Major { get; set; }
 
-        public string Minor { get; set; }
+        public bool Minor { get; set; }
 
-        public string Patch { get; set; }
+        public bool Patch { get; set; }
 
-        public string Revision { get; set; }
+        public bool Revision { get; set; }
 
         public string Label { get; set; }
-
-        public string LabelAction { get; set; } = "Increment";
 
         public int LabelDigits { get; set; } = 6;
     }

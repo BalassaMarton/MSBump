@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <UsingTask AssemblyFile="$(MSBumpPath)\MSBump.dll" TaskName="MSBump.BumpVersion" />
+
+    <Target Name="BumpVersionAfterBuild" AfterTargets="Build">
+        <BumpVersion ProjectPath="$(ProjectPath)" Major="$(BumpMajor)" Minor="$(BumpMinor)" Patch="$(BumpPatch)" Revision="$(BumpRevision)" Label="$(BumpLabel)" LabelDigits="$(BumpLabelDigits)"/>
+    </Target>
+</Project>
