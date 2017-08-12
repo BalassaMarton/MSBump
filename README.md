@@ -78,30 +78,9 @@ Reset attributes are prioritized over Bump attributes.
 ```
 The above example will increment the revision number of the project after every build.
 
-The `BumpVersion` task accepts the following attributes:
+The `BumpVersion` task accepts the following attributes (description at the NuGet version):
 
-### `ProjectPath`
-The full path of the project file.
-
-### `BumpMajor`, `BumpMinor`, `BumpPatch` and `BumpRevision`
-These boolean attributes control which part of the version is changed. 
-To increment a specific part, add the corresponding attribute with `True` value.
-
-Example - increment the revision number after every release build:
-```xml
-<BumpVersion ProjectPath="$(ProjectPath)" Revision="True"/>
-```
-From an initial version of `1.0.0`, hitting build multiple times will change the version to `1.0.0.1`, `1.0.0.2`, etc.
-
-### `BumpLabel` and `LabelDigits`
-Using these attributes, the task will add or increment a release label. Labels must be alphanumeric, and must not end in a digit. `LabelDigits` defaults to 6 if not specified.
-
-Example - add a `dev` label with a 4-digit counter on every build:
-```xml
-<BumpVersion ProjectPath="$(ProjectPath)" Label="dev" LabelDigits="4"/>
-```
-
-From an initial version of `1.0.0`, hitting build multiple times will change the version to `1.0.0-dev0001`, `1.0.0-dev0002`, etc.
+`ProjectPath`, `BumpMajor`, `BumpMinor`, `BumpPatch`, `BumpRevision`, `BumpLabel`, `LabelDigits`, `ResetMajor`, `ResetMinor`, `ResetPatch`, `RestRevision`, `ResetLabel`.
 
 ## Version history
 
