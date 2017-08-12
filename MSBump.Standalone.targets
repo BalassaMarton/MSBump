@@ -5,4 +5,5 @@
     </PropertyGroup>
 
     <UsingTask AssemblyFile="$(MSBumpPath)\MSBump.dll" TaskName="MSBump.BumpVersion" />
+
 </Project>

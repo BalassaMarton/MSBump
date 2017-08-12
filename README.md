@@ -69,14 +69,17 @@ Reset attributes are prioritized over Bump attributes.
   <Import Project="$(MSBuildExtensionsPath)\MSBump\MSBump.Standalone.targets" />
 ```
 
-5. Create a `Target` that runs after the build (doesn't really matter when it runs)
+5. Create a `Target` that runs before the Build task
 
 ```xml
-<Target Name="MyAfterBuild" AfterTargets="Build">
-  <BumpVersion ProjectPath="$(ProjectPath)" BumpRevision="True"/>
-</Target>
+  <Target Name="BumpBeforeBuild" BeforeTargets="Build">
+    <BumpVersion ProjectPath="$(ProjectPath)" BumpRevision="True">
+      <Output TaskParameter="NewVersion" PropertyName="Version" />
+      <Output TaskParameter="NewVersion" PropertyName="PackageVersion" />
+    </BumpVersion>
+  </Target>
 ```
-The above example will increment the revision number of the project after every build.
+The above example will increment the revision number of the project after every build. The output parameters are needed so that the Build and Pack tasks receive the correct version.
 
 The `BumpVersion` task accepts the following attributes (description at the NuGet version):
 
