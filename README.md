@@ -39,8 +39,23 @@ Example - add a `dev` label with a 4-digit counter on every build:
     </PropertyGroup>   
 ```
 
-From an initial version of `1.0.0`, hitting build multiple times will change the version to `1.0.0-dev0001`, `1.0.0-dev0002`, etc.
+### `BumpResetMajor`, `BumpResetMinor`, `BumpResetPatch`, `BumpResetRevision` or `BumpResetLabel`
 
+These properties will reset any part of the version. Major, Minor, Patch and Revision is reset to 0. When `BumpResetLabel` is used, the specified label is removed from the version.
+
+Example - Increment the revision number on every Release build, add an incrementing `dev` label on Debug builds.
+```xml
+  <PropertyGroup Condition=" '$(Configuration)'=='Debug'">
+    <BumpLabel>dev</BumpLabel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)'=='Release'">
+    <BumpResetLabel>dev</BumpResetLabel>
+    <BumpRevision>True</BumpRevision>
+  </PropertyGroup>
+```
+
+Reset attributes are prioritized over Bump attributes.
 
 ## Usage (standalone)
 
@@ -58,7 +73,7 @@ From an initial version of `1.0.0`, hitting build multiple times will change the
 
 ```xml
 <Target Name="MyAfterBuild" AfterTargets="Build">
-  <BumpVersion ProjectPath="$(ProjectPath)" Revision="True"/>
+  <BumpVersion ProjectPath="$(ProjectPath)" BumpRevision="True"/>
 </Target>
 ```
 The above example will increment the revision number of the project after every build.
@@ -68,7 +83,7 @@ The `BumpVersion` task accepts the following attributes:
 ### `ProjectPath`
 The full path of the project file.
 
-### `Major`, `Minor`, `Patch` and `Revision`
+### `BumpMajor`, `BumpMinor`, `BumpPatch` and `BumpRevision`
 These boolean attributes control which part of the version is changed. 
 To increment a specific part, add the corresponding attribute with `True` value.
 
@@ -78,7 +93,7 @@ Example - increment the revision number after every release build:
 ```
 From an initial version of `1.0.0`, hitting build multiple times will change the version to `1.0.0.1`, `1.0.0.2`, etc.
 
-### `Label` and `LabelDigits`
+### `BumpLabel` and `LabelDigits`
 Using these attributes, the task will add or increment a release label. Labels must be alphanumeric, and must not end in a digit. `LabelDigits` defaults to 6 if not specified.
 
 Example - add a `dev` label with a 4-digit counter on every build:
@@ -88,14 +103,11 @@ Example - add a `dev` label with a 4-digit counter on every build:
 
 From an initial version of `1.0.0`, hitting build multiple times will change the version to `1.0.0-dev0001`, `1.0.0-dev0002`, etc.
 
-## Why is my NuGet package version one step behind the project version?
-
-This is because by the time the task can save the changed version to the project file,
-MSBuild has already loaded the file. You can think of your project version as the *next* 
-version of your NuGet package. If you insist on having the same version on both ends,
-you can execute `NuGet pack` in a task after `BumpVersion` so that NuGet.exe can load the modified project file.
-
 ## Version history
+
+### 2.1.0 (2017-08-12)
+
+* MSBump now correctly bumps the version before build and pack, the built and packaged project always has the same version as the project file.
 
 ### 2.0.0 (2017-04-26)
 

@@ -2,7 +2,43 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <UsingTask AssemblyFile="$(MSBumpPath)\MSBump.dll" TaskName="MSBump.BumpVersion" />
 
-    <Target Name="BumpVersionAfterBuild" AfterTargets="Build">
-        <BumpVersion ProjectPath="$(ProjectPath)" Major="$(BumpMajor)" Minor="$(BumpMinor)" Patch="$(BumpPatch)" Revision="$(BumpRevision)" Label="$(BumpLabel)" LabelDigits="$(BumpLabelDigits)"/>
-    </Target>
+    <Target Name="BumpVersionBeforeBuild">
+        <BumpVersion
+            ProjectPath="$(ProjectPath)" 
+            BumpMajor="$(BumpMajor)" 
+            BumpMinor="$(BumpMinor)" 
+            BumpPatch="$(BumpPatch)" 
+            BumpRevision="$(BumpRevision)" 
+            BumpLabel="$(BumpLabel)"
+            ResetMajor="$(BumpResetMajor)" 
+            ResetMinor="$(BumpResetMinor)" 
+            ResetPatch="$(BumpResetPatch)" 
+            ResetRevision="$(BumpResetRevision)" 
+            ResetLabel="$(BumpResetLabel)"
+            LabelDigits="$(BumpLabelDigits)">
+
+            <Output TaskParameter="NewVersion" PropertyName="VersionAfterBump" />
+        </BumpVersion>
+
+        <CreateProperty  
+            Value="$(VersionAfterBump)">
+            <Output  
+                TaskParameter="Value"  
+                PropertyName="Version"/>  
+        </CreateProperty>  
+        <CreateProperty  
+            Value="$(VersionAfterBump)">
+            <Output  
+                TaskParameter="Value"  
+                PropertyName="PackageVersion"/>  
+        </CreateProperty>  
+  
+    </Target>  
+
+    <PropertyGroup>
+        <BuildDependsOn>
+            BumpVersionBeforeBuild;
+            $(BuildDependsOn)
+        </BuildDependsOn>
+    </PropertyGroup>
 </Project>
