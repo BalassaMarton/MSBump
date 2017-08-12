@@ -59,6 +59,8 @@ Reset attributes are prioritized over Bump attributes.
 
 ## Usage (standalone)
 
+This might be more convenient when working with a lot of packages that reference each other as NuGet packages.
+
 1. Locate your `MSBuild` folder. It is usually `Program Files\Microsoft Visual Studio\2017\(your edition)\MSBuild`.
 2. Extract the contents of the zip file to this folder (you should end up with an `MSBump` folder under `MSBuild`, with `.dll` and `.targets` files.
 3. Edit your project file
@@ -79,7 +81,49 @@ Reset attributes are prioritized over Bump attributes.
     </BumpVersion>
   </Target>
 ```
-The above example will increment the revision number of the project after every build. The output parameters are needed so that the Build and Pack tasks receive the correct version.
+
+But how is this better than adding a NuGet package to my projects? Wait for it... 
+
+MSBuild 15 can load `.props` and `.targets` files automatically, given they have the special name `Directory.Build.props` and `Directory.Build.targets`. We can enforce repositry-wide build processes by simply placing the build script in a `Directory.Build.targets` file at the root of the repository.
+Example - Increment revision when releasing, add a `dev` label when debugging, and push the generated NuGet package to a local folder:
+
+```xml
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+      <LocalNugetDirectory> Path to your local nuget feed </LocalNugetDirectory>
+    </PropertyGroup>
+
+    <!-- Import MSBump -->
+
+    <Import Project="$(MSBuildExtensionsPath)\MSBump\MSBump.Standalone.targets" />
+    
+    <!-- Increment dev label on Debug build, increment the revision number on Release build -->
+
+    <Target Name="BumpVersionBeforeDebugBuild" BeforeTargets="Build" Condition=" '$(Configuration)'=='Debug' And $(MSBuildProjectExtension) == '.csproj' ">
+        <BumpVersion ProjectPath="$(ProjectPath)" BumpLabel="dev">
+            <Output TaskParameter="NewVersion" PropertyName="Version" />
+            <Output TaskParameter="NewVersion" PropertyName="PackageVersion" />
+        </BumpVersion>
+    </Target>
+
+    <Target Name="BumpVersionBeforeReleaseBuild" BeforeTargets="Build" Condition=" '$(Configuration)'=='Release' And $(MSBuildProjectExtension) == '.csproj' ">
+        <BumpVersion ProjectPath="$(ProjectPath)" ResetLabel="dev" BumpRevision="True">
+            <Output TaskParameter="NewVersion" PropertyName="Version" />
+            <Output TaskParameter="NewVersion" PropertyName="PackageVersion" />
+        </BumpVersion>
+    </Target>
+
+    <!-- Push the package to the local nuget feed -->
+
+    <Target Name="CopyPackage" AfterTargets="Pack" Condition=" $(MSBuildProjectExtension) == '.csproj' ">
+        <Copy SourceFiles="$(OutputPath)..\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(LocalNugetDirectory)" />
+    </Target>
+
+</Project>
+```
+
+We don't need to add anything to the project files.
 
 The `BumpVersion` task accepts the following attributes (description at the NuGet version):
 
