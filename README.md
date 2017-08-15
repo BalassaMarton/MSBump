@@ -65,7 +65,7 @@ MSBump settings can be declared in a separate `.msbump` file.
 This file must be placed next to the project file, and must have the same name as the project file, but with the `.msbump` extension.
 The file itself is a JSON file that contains the properties for the task object. 
 When per-configuration settings are desireable, the settings file should be structured like this:
-```json
+```js
 {
   Configurations: {
     "Debug": {
@@ -88,7 +88,7 @@ These boolean properties control which part of the version is changed.
 To increment a specific part, add the corresponding property with true value.
 
 Example - increment the revision number:
-```json
+```js
 {
   BumpRevision: true
 }    
@@ -99,7 +99,7 @@ From an initial version of `1.0.0`, hitting build multiple times will change the
 Using these properties, the task will add or increment a release label. Labels must be alphanumeric, and must not end in a digit. `LabelDigits` defaults to 6 if not specified.
 
 Example - add a `dev` label with a 4-digit counter on every build:
-```json
+```js
 {
   BumpLabel: "dev",
   LabelDigits: 4
@@ -111,7 +111,7 @@ Example - add a `dev` label with a 4-digit counter on every build:
 These properties will reset any part of the version. Major, Minor, Patch and Revision is reset to 0. When `ResetLabel` is used, the specified label is removed from the version.
 
 Example - Increment the revision number on every Release build, add `dev` label with a 4-digit counter on Debug builds.
-```json
+```js
 {
   Configurations: {
     "Debug": {
