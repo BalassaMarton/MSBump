@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
     <UsingTask AssemblyFile="$(MSBumpPath)\MSBump.dll" TaskName="MSBump.BumpVersion" />
 
     <Target Name="BumpVersionBeforeBuild">
+        
         <BumpVersion
+            Configuration="$(Configuration)"
             ProjectPath="$(ProjectPath)" 
             BumpMajor="$(BumpMajor)" 
             BumpMinor="$(BumpMinor)" 
@@ -17,22 +20,10 @@
             ResetLabel="$(BumpResetLabel)"
             LabelDigits="$(BumpLabelDigits)">
 
-            <Output TaskParameter="NewVersion" PropertyName="VersionAfterBump" />
+            <Output TaskParameter="NewVersion" PropertyName="Version" />
+            <Output TaskParameter="NewVersion" PropertyName="PackageVersion" />
         </BumpVersion>
 
-        <CreateProperty  
-            Value="$(VersionAfterBump)">
-            <Output  
-                TaskParameter="Value"  
-                PropertyName="Version"/>  
-        </CreateProperty>  
-        <CreateProperty  
-            Value="$(VersionAfterBump)">
-            <Output  
-                TaskParameter="Value"  
-                PropertyName="PackageVersion"/>  
-        </CreateProperty>  
-  
     </Target>  
 
     <PropertyGroup>
@@ -40,5 +31,7 @@
             BumpVersionBeforeBuild;
             $(BuildDependsOn)
         </BuildDependsOn>
+
+        <MSBumpLoaded>True</MSBumpLoaded>
     </PropertyGroup>
 </Project>

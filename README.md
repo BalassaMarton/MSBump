@@ -1,6 +1,6 @@
 # MSBump
-MSBuild task that bumps the version of a Visual Studio 2017 project.
-This is a work in progress, with more features coming, currently only tested with `.csproj` files.
+MSBump is a MSBuild 15 task that bumps the version of a Visual Studio 2017 project.
+Currently only tested on `.csproj` files.
 
 ## Purpose
 
@@ -14,48 +14,7 @@ part of the project version.
 
 1. Add the `MSBump` NuGet package to your project.
 2. Edit the project file. Make sure the file has a `<Version>` property.
-3. Add one of the following properties:
-
-### `BumpMajor`, `BumpMinor`, `BumpPatch` or `BumpRevision`
-These boolean properties control which part of the version is changed. 
-To increment a specific part, add the corresponding property with `True` value.
-
-Example - increment the revision number after every release build:
-```xml
-    <PropertyGroup Condition=" '$(Configuration)'=='Release'">
-        <BumpRevision>True</BumpRevision>
-    </PropertyGroup>
-```
-From an initial version of `1.0.0`, hitting build multiple times will change the version to `1.0.0.1`, `1.0.0.2`, etc.
-
-### `BumpLabel` and `BumpLabelDigits`
-Using these properties, the task will add or increment a release label. Labels must be alphanumeric, and must not end in a digit. `BumpLabelDigits` defaults to 6 if not specified.
-
-Example - add a `dev` label with a 4-digit counter on every build:
-```xml
-    <PropertyGroup>
-        <BumpLabel>dev</BumpLabel>
-        <BumpLabelDigits>4</BumpLabelDigits>
-    </PropertyGroup>   
-```
-
-### `BumpResetMajor`, `BumpResetMinor`, `BumpResetPatch`, `BumpResetRevision` or `BumpResetLabel`
-
-These properties will reset any part of the version. Major, Minor, Patch and Revision is reset to 0. When `BumpResetLabel` is used, the specified label is removed from the version.
-
-Example - Increment the revision number on every Release build, add an incrementing `dev` label on Debug builds.
-```xml
-  <PropertyGroup Condition=" '$(Configuration)'=='Debug'">
-    <BumpLabel>dev</BumpLabel>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)'=='Release'">
-    <BumpResetLabel>dev</BumpResetLabel>
-    <BumpRevision>True</BumpRevision>
-  </PropertyGroup>
-```
-
-Reset attributes are prioritized over Bump attributes.
+3. Create a `.msbump` settings file (see below) OR go to step 5 of the next section.
 
 ## Usage (standalone)
 
@@ -63,73 +22,151 @@ This might be more convenient when working with a lot of packages that reference
 
 1. Locate your `MSBuild` folder. It is usually `Program Files\Microsoft Visual Studio\2017\(your edition)\MSBuild`.
 2. Extract the contents of the zip file to this folder (you should end up with an `MSBump` folder under `MSBuild`, with `.dll` and `.targets` files.
-3. Edit your project file
+3. Edit your project file OR `Directory.Build.targets` file, if you want to enforce these build settings to a solution or entire repository (see [the MSBuild documentation](https://docs.microsoft.com/en-us/visualstudio/msbuild/what-s-new-in-msbuild-15-0))
+
 4. Import `MSBump.Standalone.targets`
 
 ```xml
-<Project>
   <Import Project="$(MSBuildExtensionsPath)\MSBump\MSBump.Standalone.targets" />
 ```
 
-5. Create a `Target` that runs before the Build task
+5. Add properties that control the MSBump task. The following table contains the property names that the MSBump target uses. 
+For details about each property, see the next section.
+
+|Property name|Task attribute|
+|-------------|--------------------------------|
+|BumpMajor|BumpMajor|
+|BumpMinor|BumpMinor|
+|BumpPatch|BumpPatch|
+|BumpRevision|BumpRevision|
+|BumpLabel|BumpLabel|
+|BumpLabelDigits|LabelDigits|
+|BumpResetMajor|ResetMajor|
+|BumpResetMinor|ResetMinor|
+|BumpResetPatch|ResetPatch|
+|BumpResetRevision|ResetRevision|
+|BumpResetLabel|ResetLabel|
+
+Example - Increment revision on every Release build, add a label on Debug builds.
+```xml
+  <PropertyGroup Condition=" '$(Configuration)'=='Debug' ">
+    <BumpLabel>dev</BumpLabel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)'=='Release' ">
+    <BumpRevision>True</BumpRevision>
+    <BumpResetLabel>dev</BumpResetLabel>
+  </PropertyGroup>
+```
+
+
+## Settings
+
+MSBump settings can be declared in a separate `.msbump` file.
+This file must be placed next to the project file, and must have the same name as the project file, but with the `.msbump` extension.
+The file itself is a JSON file that contains the properties for the task object. 
+When per-configuration settings are desireable, the settings file should be structured like this:
+```json
+{
+  Configurations: {
+    "Debug": {
+      /* properties */
+    },
+    
+    "Release": {
+      /* properties */
+    }
+  }
+}
+```
+
+Note that when a `.msbump` file is present, all other properties declared in `.targets` files are ignored for the current project. This is helpful when we use repository-wide MSBump configuration, but want to override this behavior for some projects. 
+
+The settings file should contain any of the following properties:
+
+### `BumpMajor`, `BumpMinor`, `BumpPatch` and `BumpRevision`
+These boolean properties control which part of the version is changed. 
+To increment a specific part, add the corresponding property with true value.
+
+Example - increment the revision number:
+```json
+{
+  BumpRevision: true
+}    
+```
+From an initial version of `1.0.0`, hitting build multiple times will change the version to `1.0.0.1`, `1.0.0.2`, etc.
+
+### `BumpLabel` and `LabelDigits`
+Using these properties, the task will add or increment a release label. Labels must be alphanumeric, and must not end in a digit. `LabelDigits` defaults to 6 if not specified.
+
+Example - add a `dev` label with a 4-digit counter on every build:
+```json
+{
+  BumpLabel: "dev",
+  LabelDigits: 4
+}
+```
+
+### `ResetMajor`, `ResetMinor`, `ResetPatch`, `ResetRevision` and `ResetLabel`
+
+These properties will reset any part of the version. Major, Minor, Patch and Revision is reset to 0. When `ResetLabel` is used, the specified label is removed from the version.
+
+Example - Increment the revision number on every Release build, add `dev` label with a 4-digit counter on Debug builds.
+```json
+{
+  Configurations: {
+    "Debug": {
+      BumpLabel: "dev"
+      LabelDigits: 4
+    },
+    
+    "Release": {
+      BumpRevision: true,
+      ResetLabel: "dev"
+    }
+  }
+}
+```
+
+Reset properties are prioritized over Bump properties.
+
+## Usage (as a NuGet package, older versions)
+
+Edit the project file. Add any of the properties listed for the standalone version.
+
+## Using the `BumpVersion` task directly
+
+When the above methods are not optimal, we can always use MSBump as a build task in a MSBuild project file. 
+For this, we need to
+1. Import the standalone version
+2. Clear or modify the `BumpVersionBeforeBuild` target so that MSBump is not executed automatically before every build.
+3. Call the task manually. Task parameter names are the same as `.msbump` configuration properties. 
+
+Example - Increment the revision number before build if a condition is set
 
 ```xml
-  <Target Name="BumpBeforeBuild" BeforeTargets="Build">
-    <BumpVersion ProjectPath="$(ProjectPath)" BumpRevision="True">
-      <Output TaskParameter="NewVersion" PropertyName="Version" />
-      <Output TaskParameter="NewVersion" PropertyName="PackageVersion" />
+  <Target Name="MyBeforeBuild" BeforeTargets="Build" Condition="$(MyCondition) == 'OK' ">
+    <BumpVersion
+    ProjectPath="$(ProjectPath)" 
+        BumpRevision="True">
+        
+        <Output TaskParameter="NewVersion" PropertyName="Version" />
+        <Output TaskParameter="NewVersion" PropertyName="PackageVersion" />
+        
     </BumpVersion>
   </Target>
 ```
 
-But how is this better than adding a NuGet package to my projects? Wait for it... 
+Don't forget to output the new version if other targets may depend on these changed versions.
+Otherwise, MSBuild will use the properties in the project file before it was saved by MSBump.
 
-MSBuild 15 can load `.props` and `.targets` files automatically, given they have the special name `Directory.Build.props` and `Directory.Build.targets`. We can enforce repositry-wide build processes by simply placing the build script in a `Directory.Build.targets` file at the root of the repository.
-Example - Increment revision when releasing, add a `dev` label when debugging, and push the generated NuGet package to a local folder:
-
-```xml
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
-  <PropertyGroup>
-      <LocalNugetDirectory> Path to your local nuget feed </LocalNugetDirectory>
-    </PropertyGroup>
-
-    <!-- Import MSBump -->
-
-    <Import Project="$(MSBuildExtensionsPath)\MSBump\MSBump.Standalone.targets" />
-    
-    <!-- Increment dev label on Debug build, increment the revision number on Release build -->
-
-    <Target Name="BumpVersionBeforeDebugBuild" BeforeTargets="Build" Condition=" '$(Configuration)'=='Debug' And $(MSBuildProjectExtension) == '.csproj' ">
-        <BumpVersion ProjectPath="$(ProjectPath)" BumpLabel="dev">
-            <Output TaskParameter="NewVersion" PropertyName="Version" />
-            <Output TaskParameter="NewVersion" PropertyName="PackageVersion" />
-        </BumpVersion>
-    </Target>
-
-    <Target Name="BumpVersionBeforeReleaseBuild" BeforeTargets="Build" Condition=" '$(Configuration)'=='Release' And $(MSBuildProjectExtension) == '.csproj' ">
-        <BumpVersion ProjectPath="$(ProjectPath)" ResetLabel="dev" BumpRevision="True">
-            <Output TaskParameter="NewVersion" PropertyName="Version" />
-            <Output TaskParameter="NewVersion" PropertyName="PackageVersion" />
-        </BumpVersion>
-    </Target>
-
-    <!-- Push the package to the local nuget feed -->
-
-    <Target Name="CopyPackage" AfterTargets="Pack" Condition=" $(MSBuildProjectExtension) == '.csproj' ">
-        <Copy SourceFiles="$(OutputPath)..\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(LocalNugetDirectory)" />
-    </Target>
-
-</Project>
-```
-
-We don't need to add anything to the project files.
-
-The `BumpVersion` task accepts the following attributes (description at the NuGet version):
-
-`ProjectPath`, `BumpMajor`, `BumpMinor`, `BumpPatch`, `BumpRevision`, `BumpLabel`, `LabelDigits`, `ResetMajor`, `ResetMinor`, `ResetPatch`, `RestRevision`, `ResetLabel`.
 
 ## Version history
+
+### 2.2.0 (2017-08-15)
+
+* Added support for settings file. No need to modify the project file at all when using the NuGet version.
+* Cleaned up `.targets` files so that the standalone and NuGet version can work side by side.
+
 
 ### 2.1.0 (2017-08-12)
 
