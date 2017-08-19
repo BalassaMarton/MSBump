@@ -16,14 +16,14 @@ part of the project version.
 2. Edit the project file. Make sure the file has a `<Version>` property.
 3. Create a `.msbump` settings file (see below) OR go to step 5 of the next section.
 
-## Usage (standalone)
+Note: Until [this](https://github.com/NuGet/Home/issues/4125) NuGet issue is fixed, you should add `PrivateAssets="All"` to the `PackageReference` declaration,
+otherwise your package will list `MSBump` as a dependency.
 
-This might be more convenient when working with a lot of packages that reference each other as NuGet packages.
+## Usage (standalone)
 
 1. Locate your `MSBuild` folder. It is usually `Program Files\Microsoft Visual Studio\2017\(your edition)\MSBuild`.
 2. Extract the contents of the zip file to this folder (you should end up with an `MSBump` folder under `MSBuild`, with `.dll` and `.targets` files.
 3. Edit your project file OR `Directory.Build.targets` file, if you want to enforce these build settings to a solution or entire repository (see [the MSBuild documentation](https://docs.microsoft.com/en-us/visualstudio/msbuild/what-s-new-in-msbuild-15-0))
-
 4. Import `MSBump.Standalone.targets`
 
 ```xml
@@ -57,7 +57,6 @@ Example - Increment revision on every Release build, add a label on Debug builds
     <BumpResetLabel>dev</BumpResetLabel>
   </PropertyGroup>
 ```
-
 
 ## Settings
 
@@ -161,6 +160,10 @@ Otherwise, MSBuild will use the properties in the project file before it was sav
 
 
 ## Version history
+
+### 2.3.0 (2017-08-19)
+
+* .NET Standard support. MSBump now works with `dotnet build`.
 
 ### 2.2.0 (2017-08-15)
 

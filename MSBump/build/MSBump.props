@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project TreatAsLocalProperty="TaskFolder">
+    
     <PropertyGroup>
-        <MSBumpPath>$(MSBuildThisFileDirectory)..\tools\MSBump</MSBumpPath>
+        <TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' ">netstandard1.6</TaskFolder>
+        <TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' ">net46</TaskFolder>
+      </PropertyGroup>
+
+    <PropertyGroup>
+        <MSBumpPath>$(MSBuildThisFileDirectory)..\tasks\$(TaskFolder)</MSBumpPath>
     </PropertyGroup>
 </Project>
