@@ -7,6 +7,7 @@ using System.Xml.XPath;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NuGet.Versioning;
 
 namespace MSBump
@@ -24,6 +25,7 @@ namespace MSBump
 
         public override bool Execute()
         {
+            Log.LogMessage(MessageImportance.Low, "MSBump task started");
             try
             {
                 var proj = XDocument.Load(ProjectPath, LoadOptions.PreserveWhitespace);
@@ -31,6 +33,7 @@ namespace MSBump
                 var settingsFilePath = Path.ChangeExtension(ProjectPath, ".msbump");
                 if (!string.IsNullOrEmpty(settingsFilePath) && File.Exists(settingsFilePath))
                 {
+                    Log.LogMessage(MessageImportance.Low, $"Loading MSBump settings from file {settingsFilePath}");
                     var settingsCollection = JsonSerializer.Create()
                         .Deserialize<SettingsCollection>(new JsonTextReader(File.OpenText(settingsFilePath)));
                     if (!string.IsNullOrEmpty(Configuration))
@@ -54,16 +57,15 @@ namespace MSBump
                         LabelDigits = LabelDigits == 0 ? Settings.DefaultLabelDigits : LabelDigits
                     };
 
+                Log.LogMessage(MessageImportance.Low, $"MSBump settings = {JObject.FromObject(settings).ToString()}");
+
                 var xversion = proj.Root.XPathSelectElement("PropertyGroup/Version");
                 if (xversion == null)
                 {
-                    BuildEngine.LogMessageEvent(new BuildMessageEventArgs(
-                        $"Version property not found in {ProjectPath}",
-                        null, GetType().Name, MessageImportance.Low));
+                    Log.LogMessage(MessageImportance.Low, $"Version property not found in {ProjectPath}");
                     return true;
                 }
-                BuildEngine.LogMessageEvent(new BuildMessageEventArgs($"Old version is {xversion.Value}", null,
-                    GetType().Name, MessageImportance.Low));
+                Log.LogMessage(MessageImportance.Low, $"Old project version is {xversion.Value}");
                 var version = new NuGetVersion(xversion.Value);
                 int major = version.Major;
                 int minor = version.Minor;
@@ -80,10 +82,7 @@ namespace MSBump
                 {
                     if (!settings.ResetLabel.All(Char.IsLetterOrDigit))
                     {
-                        BuildEngine.LogMessageEvent(
-                            new BuildMessageEventArgs(
-                                $"Invalid version label for {GetType().Name}: {settings.ResetLabel} - only alphanumeric characters are allowed",
-                                null, GetType().Name, MessageImportance.High));
+                        Log.LogError($"Invalid version label for {GetType().Name}: {settings.ResetLabel} - only alphanumeric characters are allowed");
                         return false;
                     }
                     var regex = new Regex($"^{settings.ResetLabel}(\\d*)$");
@@ -103,10 +102,7 @@ namespace MSBump
                 {
                     if (!settings.BumpLabel.All(Char.IsLetterOrDigit))
                     {
-                        BuildEngine.LogMessageEvent(
-                            new BuildMessageEventArgs(
-                                $"Invalid version label for {GetType().Name}: {settings.BumpLabel} - only alphanumeric characters are allowed",
-                                null, GetType().Name, MessageImportance.High));
+                        Log.LogError($"Invalid version label for {GetType().Name}: {settings.BumpLabel} - only alphanumeric characters are allowed");
                         return false;
                     }
                     var regex = new Regex($"^{settings.BumpLabel}(\\d*)$");
@@ -128,9 +124,7 @@ namespace MSBump
                 var newVersion = new NuGetVersion(major, minor, patch, revision, labels, version.Metadata);
                 if (newVersion != version)
                 {
-                    BuildEngine.LogMessageEvent(
-                        new BuildMessageEventArgs($"Changing project version to {newVersion.ToString()}...", null,
-                            GetType().Name, MessageImportance.High));
+                    Log.LogMessage(MessageImportance.High, $"Changing project version to {newVersion}...");
                     xversion.Value = newVersion.ToString();
                     using (var stream = File.Create(ProjectPath))
                         proj.Save(stream);
@@ -139,9 +133,7 @@ namespace MSBump
             }
             catch (Exception e)
             {
-                BuildEngine.LogMessageEvent(
-                    new BuildMessageEventArgs(e.Message, null,
-                        GetType().Name, MessageImportance.High));
+                Log.LogErrorFromException(e);
                 return false;
             }
             return true;

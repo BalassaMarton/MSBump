@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project>
 
     <UsingTask AssemblyFile="$(MSBumpPath)\MSBump.dll" TaskName="MSBump.BumpVersion" />
 
-    <Target Name="BumpVersionBeforeBuild">
-        
+    <Target Name="BumpVersionBeforeBuild" BeforeTargets="Build">
+
         <BumpVersion
             Configuration="$(Configuration)"
             ProjectPath="$(ProjectPath)" 
@@ -27,11 +27,7 @@
     </Target>  
 
     <PropertyGroup>
-        <BuildDependsOn>
-            BumpVersionBeforeBuild;
-            $(BuildDependsOn)
-        </BuildDependsOn>
-
         <MSBumpLoaded>True</MSBumpLoaded>
     </PropertyGroup>
+
 </Project>
