@@ -1,33 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project>
+<Project TreatAsLocalProperty="TaskFolder">
+    
+  <Target Name="BumpVersionBeforeBuild" BeforeTargets="BeforeBuild" Condition="!Exists($(MSBumpLockFilePath))">
+      
+    <BumpVersion
+      Configuration="$(Configuration)"
+      ProjectPath="$(MSBuildProjectFullPath)"
 
-    <UsingTask AssemblyFile="$(MSBumpPath)\MSBump.dll" TaskName="MSBump.BumpVersion" />
+      BumpMajor="$(BumpMajor)" 
+      BumpMinor="$(BumpMinor)" 
+      BumpPatch="$(BumpPatch)" 
+      BumpRevision="$(BumpRevision)" 
+      BumpLabel="$(BumpLabel)"
+      ResetMajor="$(BumpResetMajor)" 
+      ResetMinor="$(BumpResetMinor)" 
+      ResetPatch="$(BumpResetPatch)" 
+      ResetRevision="$(BumpResetRevision)" 
+      ResetLabel="$(BumpResetLabel)"
+      LabelDigits="$(BumpLabelDigits)">
 
-    <Target Name="BumpVersionBeforeBuild" BeforeTargets="Build">
-
-        <BumpVersion
-            Configuration="$(Configuration)"
-            ProjectPath="$(ProjectPath)" 
-            BumpMajor="$(BumpMajor)" 
-            BumpMinor="$(BumpMinor)" 
-            BumpPatch="$(BumpPatch)" 
-            BumpRevision="$(BumpRevision)" 
-            BumpLabel="$(BumpLabel)"
-            ResetMajor="$(BumpResetMajor)" 
-            ResetMinor="$(BumpResetMinor)" 
-            ResetPatch="$(BumpResetPatch)" 
-            ResetRevision="$(BumpResetRevision)" 
-            ResetLabel="$(BumpResetLabel)"
-            LabelDigits="$(BumpLabelDigits)">
-
-            <Output TaskParameter="NewVersion" PropertyName="Version" />
-            <Output TaskParameter="NewVersion" PropertyName="PackageVersion" />
-        </BumpVersion>
-
-    </Target>  
-
+      <Output TaskParameter="NewVersion" PropertyName="MSBumpNewVersion" />
+    </BumpVersion>
+    
     <PropertyGroup>
-        <MSBumpLoaded>True</MSBumpLoaded>
+      <Version Condition="$(MSBumpNewVersion) != ''">$(MSBumpNewVersion)</Version>
+      <PackageVersion Condition="$(MSBumpNewVersion) != ''">$(MSBumpNewVersion)</PackageVersion>
     </PropertyGroup>
+
+  </Target>
+
+  <PropertyGroup>
+    <MSBumpLoaded>True</MSBumpLoaded>
+  </PropertyGroup>
 
 </Project>

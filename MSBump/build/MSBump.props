@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project TreatAsLocalProperty="TaskFolder">
     
-    <PropertyGroup>
-        <TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' ">netstandard1.6</TaskFolder>
-        <TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' ">net46</TaskFolder>
-      </PropertyGroup>
+  <PropertyGroup>
+    <TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' ">netstandard1.6</TaskFolder>
+    <TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' ">net46</TaskFolder>
+    <MSBumpPath>$(MSBuildThisFileDirectory)..\tasks\$(TaskFolder)</MSBumpPath>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <MSBumpPath>$(MSBuildThisFileDirectory)..\tasks\$(TaskFolder)</MSBumpPath>
-    </PropertyGroup>
+  <UsingTask AssemblyFile="$(MSBumpPath)\MSBump.dll" TaskName="MSBump.BumpVersion" />
+
+  <PropertyGroup>
+    <MSBumpLockFilePath>$(MSBuildProjectDirectory)\.msbump.lock</MSBumpLockFilePath>
+  </PropertyGroup>
+  
 </Project>

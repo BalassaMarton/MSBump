@@ -1,7 +1,6 @@
-<!-- 
-  This file is automatically imported by NuGet into a user's project
-  when it targets multiple frameworks, e.g. <TargetFrameworks>net46;netcoreapp1.0</TargetFrameworks>
--->
+<?xml version="1.0" encoding="utf-8"?>
 <Project>
-  <Import Project="..\build\MSBump.props" />
+
+  <Import Project="$(MSBuildThisFileDirectory)..\build\MSBump.props"/>
+  
 </Project>
