@@ -1,7 +1,41 @@
-<!-- 
-  This file is automatically imported by NuGet into a user's project
-  when it targets multiple frameworks, e.g. <TargetFrameworks>net46;netcoreapp1.0</TargetFrameworks>
--->
-<Project>
-  <Import Project="..\build\MSBump.targets" />
+<?xml version="1.0" encoding="utf-8"?>
+<Project TreatAsLocalProperty="TaskFolder">
+
+  <Target Name="BumpVersionBeforeOuterBuild" BeforeTargets="DispatchToInnerBuilds">
+
+    <Touch Files="$(MSBumpLockFilePath)" AlwaysCreate="true"/>
+
+    <BumpVersion
+      Configuration="$(Configuration)"
+      ProjectPath="$(MSBuildProjectFullPath)"
+
+      BumpMajor="$(BumpMajor)"
+      BumpMinor="$(BumpMinor)"
+      BumpPatch="$(BumpPatch)"
+      BumpRevision="$(BumpRevision)"
+      BumpLabel="$(BumpLabel)"
+      ResetMajor="$(BumpResetMajor)"
+      ResetMinor="$(BumpResetMinor)"
+      ResetPatch="$(BumpResetPatch)"
+      ResetRevision="$(BumpResetRevision)"
+      ResetLabel="$(BumpResetLabel)"
+      LabelDigits="$(BumpLabelDigits)">
+
+      <Output TaskParameter="NewVersion" PropertyName="MSBumpNewVersion" />
+    </BumpVersion>
+
+    <PropertyGroup>
+      <Version Condition="$(MSBumpNewVersion) != ''">$(MSBumpNewVersion)</Version>
+      <PackageVersion Condition="$(MSBumpNewVersion) != ''">$(MSBumpNewVersion)</PackageVersion>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="MSBumpAfterOuterBuild" AfterTargets="Build">
+    <Delete Files="$(MSBumpLockFilePath)"/>
+  </Target>
+
+  <PropertyGroup>
+    <MSBumpLoaded>True</MSBumpLoaded>
+  </PropertyGroup>
+
 </Project>

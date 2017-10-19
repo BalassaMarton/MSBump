@@ -3,8 +3,10 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6;net46</TargetFrameworks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <VersionPrefix>2.3.1</VersionPrefix>
-    <VersionSuffix>pre$([System.DateTime]::Now.ToString('yyyyMMddHHmm'))</VersionSuffix>
+    <VersionPrefix>2.3.2</VersionPrefix>
+    <VersionSuffix Condition="$(Configuration) == 'Release'">pre1</VersionSuffix>
+    <VersionSuffix Condition="$(Configuration) == 'Debug'">pre$([System.DateTime]::Now.ToString('yyyyMMddHHmm'))</VersionSuffix>
+    
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
 
@@ -12,11 +14,16 @@
     <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
     <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
     <DevelopmentDependency>True</DevelopmentDependency>
+    <PackageId>MSBump</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="build\*" PackagePath="build\" />
     <Content Include="buildMultiTargeting\*" PackagePath="buildMultiTargeting\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="MSBump.2.3.2-pre1.nupkg" />
   </ItemGroup>
   
   <ItemGroup>
