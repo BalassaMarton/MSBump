@@ -84,7 +84,7 @@ namespace MSBump
 
 	        xmlNamespaceManager.AddNamespace(defaultNamespacePrefix, defaultNamespace.NamespaceName);
 
-	        var element = proj.Root.XPathSelectElement($"{defaultNamespacePrefix}:PropertyGroup/{defaultNamespacePrefix}:{tagName}");
+	        var element = proj.Root.XPathSelectElement($"{defaultNamespacePrefix}:PropertyGroup/{defaultNamespacePrefix}:{tagName}", xmlNamespaceManager);
 
             if (element == null)
                 return false;
