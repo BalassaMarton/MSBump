@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Build.Framework;
@@ -77,7 +78,14 @@ namespace MSBump
 
         private bool TryBump(XDocument proj, string tagName, Settings settings)
         {
-            var element = proj.Root.XPathSelectElement("PropertyGroup/" + tagName);
+	        var defaultNamespace = proj.Root.GetDefaultNamespace();
+	        var defaultNamespacePrefix = "ns";
+	        var xmlNamespaceManager = new XmlNamespaceManager(new NameTable());
+
+	        xmlNamespaceManager.AddNamespace(defaultNamespacePrefix, defaultNamespace.NamespaceName);
+
+	        var element = proj.Root.XPathSelectElement($"{defaultNamespacePrefix}:PropertyGroup/{defaultNamespacePrefix}:{tagName}");
+
             if (element == null)
                 return false;
             var oldVersion = new NuGetVersion(element.Value);
