@@ -4,7 +4,7 @@
     <TargetFrameworks>netstandard1.6;net46</TargetFrameworks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <VersionPrefix>2.3.2</VersionPrefix>
-    <VersionSuffix Condition="$(Configuration) == 'Release'">pre1</VersionSuffix>
+    <VersionSuffix Condition="$(Configuration) == 'Release'"></VersionSuffix>
     <VersionSuffix Condition="$(Configuration) == 'Debug'">pre$([System.DateTime]::Now.ToString('yyyyMMddHHmm'))</VersionSuffix>
     
     <NoPackageAnalysis>true</NoPackageAnalysis>
@@ -15,15 +15,16 @@
     <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
     <DevelopmentDependency>True</DevelopmentDependency>
     <PackageId>MSBump</PackageId>
+    <Authors>BalassaMarton</Authors>
+    <Company />
+    <Description>MSBuild task that bumps the version of a Visual Studio 2017 project before build and pack.</Description>
+    <PackageProjectUrl>https://github.com/BalassaMarton/MSBump</PackageProjectUrl>
+    <PackageTags>msbuild bump package version</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="build\*" PackagePath="build\" />
     <Content Include="buildMultiTargeting\*" PackagePath="buildMultiTargeting\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="MSBump.2.3.2-pre1.nupkg" />
   </ItemGroup>
   
   <ItemGroup>
@@ -38,10 +39,10 @@
   </ItemGroup>
 
   <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
-    <!--
-    The include needs to happen after output has been copied to build output folder
-    but before NuGet generates a nuspec.
-    -->
+    
+    <!--The include needs to happen after output has been copied to build output folder
+    but before NuGet generates a nuspec.-->
+    
     <ItemGroup>
       <_PackageFiles Include="bin\$(Configuration)\**\*.dll">
         <PackagePath>tasks\%(RecursiveDir)</PackagePath>

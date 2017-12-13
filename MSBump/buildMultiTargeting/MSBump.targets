@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project TreatAsLocalProperty="TaskFolder">
+<Project>
 
-  <Target Name="BumpVersionBeforeOuterBuild" BeforeTargets="DispatchToInnerBuilds">
+  <Target Name="MSBumpBeforeOuterBuild" BeforeTargets="DispatchToInnerBuilds">
 
     <Touch Files="$(MSBumpLockFilePath)" AlwaysCreate="true"/>
 
@@ -30,7 +30,7 @@
     </PropertyGroup>
   </Target>
 
-  <Target Name="MSBumpAfterOuterBuild" AfterTargets="Build">
+  <Target Name="MSBumpAfterOuterBuild" AfterTargets="DispatchToInnerBuilds">
     <Delete Files="$(MSBumpLockFilePath)"/>
   </Target>
 

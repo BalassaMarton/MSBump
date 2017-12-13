@@ -78,6 +78,7 @@ namespace MSBump
 
         private bool TryBump(XDocument proj, string tagName, Settings settings)
         {
+            // ReSharper disable once PossibleNullReferenceException
 	        var defaultNamespace = proj.Root.GetDefaultNamespace();
 	        var defaultNamespacePrefix = "ns";
 	        var xmlNamespaceManager = new XmlNamespaceManager(new NameTable());

@@ -10,7 +10,7 @@
   <UsingTask AssemblyFile="$(MSBumpPath)\MSBump.dll" TaskName="MSBump.BumpVersion" />
 
   <PropertyGroup>
-    <MSBumpLockFilePath>$(MSBuildProjectDirectory)\.msbump.lock</MSBumpLockFilePath>
+    <MSBumpLockFilePath>$(MSBuildProjectDirectory)\$(MSBuildProjectName).msbump.lock</MSBumpLockFilePath>
   </PropertyGroup>
   
 </Project>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project TreatAsLocalProperty="TaskFolder">
-    
-  <Target Name="BumpVersionBeforeBuild" BeforeTargets="BeforeBuild" Condition="!Exists($(MSBumpLockFilePath))">
-      
+<Project>
+
+  <Target Name="MSBumpBeforeBuild" BeforeTargets="BeforeBuild" Condition="!Exists($(MSBumpLockFilePath))">
+
     <BumpVersion
       Configuration="$(Configuration)"
       ProjectPath="$(MSBuildProjectFullPath)"
