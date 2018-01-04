@@ -20,11 +20,13 @@
       LabelDigits="$(BumpLabelDigits)">
 
       <Output TaskParameter="NewVersion" PropertyName="MSBumpNewVersion" />
+      <Output TaskParameter="NewAssemblyVersion" PropertyName="MSBumpNewAssemblyVersion" />
     </BumpVersion>
     
     <PropertyGroup>
       <Version Condition="$(MSBumpNewVersion) != ''">$(MSBumpNewVersion)</Version>
       <PackageVersion Condition="$(MSBumpNewVersion) != ''">$(MSBumpNewVersion)</PackageVersion>
+      <AssemblyVersion Condition="$(MSBumpNewAssemblyVersion) != ''">$(MSBumpNewAssemblyVersion)</AssemblyVersion>
     </PropertyGroup>
 
   </Target>

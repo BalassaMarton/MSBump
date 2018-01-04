@@ -40,10 +40,10 @@ namespace MSBump
                                         LabelDigits = LabelDigits == 0 ? Settings.DefaultLabelDigits : LabelDigits
                                     };
 
-                Log.LogMessage(MessageImportance.Low, $"MSBump settings = {JObject.FromObject(settings).ToString()}");
+				Log.LogMessage(MessageImportance.Low, $"MSBump settings = {JObject.FromObject(settings).ToString()}");
 
-                if (TryBump(proj, "Version", settings))
-                {
+				if (TryBump(proj, "Version", settings) | TryBump(proj, "AssemblyVersion", settings))
+				{
                     Log.LogMessage(MessageImportance.Low, "Saving project file");
                     using (var stream = File.Create(ProjectPath))
                     {
@@ -202,5 +202,8 @@ namespace MSBump
 
         [Output]
         public string NewVersion { get; set; }
-    }
+
+		[Output]
+		public string NewAssemblyVersion { get; set; }
+	}
 }
