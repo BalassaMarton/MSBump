@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <!-- Pack after build so that nuget package references are pointing to the correct version. -->
+
+    <Target Name="PackAfterBuild" AfterTargets="Build">
+        <Exec Command="dotnet pack --no-build"/>
+    </Target>
+
+</Project>

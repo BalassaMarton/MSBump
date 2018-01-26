@@ -16,8 +16,14 @@ part of the project version.
 2. Edit the project file. Make sure the file has a `<Version>` property.
 3. Create a `.msbump` settings file (see below) or add the corresponding properties to the project (see next section).
 
-Note: Until [this](https://github.com/NuGet/Home/issues/4125) NuGet issue is fixed, you should add `PrivateAssets="All"` to the `PackageReference` declaration,
+Warning: Until [this](https://github.com/NuGet/Home/issues/4125) NuGet issue is fixed, you should add `PrivateAssets="All"` to the `PackageReference` declaration,
 otherwise your package will list `MSBump` as a dependency.
+
+Also, until [this](https://github.com/NuGet/Home/issues/4790) is fixed, P2P references inside the solution will have incorrect version number in the generated NuGet packages.
+To resolve this,
+1. Turn off "Generate NuGet package on build" in project properties.
+2. Add `dotnet pack --no-build` as a post-build task.
+After this, all your P2P references in the generated packages should have the correct (bumped) version after building the solution.
 
 ## Settings
 
