@@ -23,6 +23,12 @@ Also, until [this](https://github.com/NuGet/Home/issues/4790) is fixed, P2P refe
 To resolve this,
 1. Turn off "Generate NuGet package on build" in project properties.
 2. Add `dotnet pack --no-build` as a post-build task.
+    * For '.targets' files in multi-target solutions, set the 'AfterTargets' attribute to 'MSBumpAfterOuterBuild':
+		```xml
+		<Target Name="PackForBump" AfterTargets="MSBumpAfterOuterBuild">
+		    <Exec Command="dotnet pack --no-build"/>
+		</Target>
+		```
 After this, all your P2P references in the generated packages should have the correct (bumped) version after building the solution.
 
 ## Settings
