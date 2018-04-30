@@ -19,8 +19,9 @@ part of the project version.
 Warning: Until [this](https://github.com/NuGet/Home/issues/4125) NuGet issue is fixed, you should add `PrivateAssets="All"` to the `PackageReference` declaration,
 otherwise your package will list `MSBump` as a dependency.
 
-Also, until [this](https://github.com/NuGet/Home/issues/4790) is fixed, P2P references inside the solution will have incorrect version number in the generated NuGet packages.
-To resolve this,
+Warning: NuGet client before version 4.6 had an issue ([this](https://github.com/NuGet/Home/issues/4790)) that resulted in incorrect
+dependency version numbers for P2P references in the generated NuGet packages. If you're experiencing this problem, try updating your NuGet client.
+If updating the NuGet client is not an option, follow these steps:
 1. Turn off "Generate NuGet package on build" in project properties.
 2. Add `dotnet pack --no-build` as a post-build task.
 After this, all your P2P references in the generated packages should have the correct (bumped) version after building the solution.
