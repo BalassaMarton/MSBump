@@ -82,7 +82,7 @@ Example - Increment the revision number on every Release build, add `dev` label 
 {
   Configurations: {
     "Debug": {
-      BumpLabel: "dev"
+      BumpLabel: "dev",
       LabelDigits: 4
     },
     
