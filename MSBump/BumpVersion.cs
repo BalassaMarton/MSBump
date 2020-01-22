@@ -37,10 +37,10 @@ namespace MSBump
                                         ResetPatch = ResetPatch,
                                         ResetRevision = ResetRevision,
                                         ResetLabel = ResetLabel,
-                                        LabelDigits = LabelDigits == 0 ? Settings.DefaultLabelDigits : LabelDigits
+                                        LabelDigits = LabelDigits
                                     };
 
-                Log.LogMessage(MessageImportance.Low, $"MSBump settings = {JObject.FromObject(settings).ToString()}");
+                Log.LogMessage(MessageImportance.Low, $"MSBump settings = {JObject.FromObject(settings)}");
 
                 if (TryBump(proj, "Version", settings))
                 {
@@ -57,6 +57,7 @@ namespace MSBump
                 Log.LogErrorFromException(e);
                 return false;
             }
+
             return true;
         }
 
@@ -72,6 +73,7 @@ namespace MSBump
                     settingsCollection.Configurations?.TryGetValue(Configuration, out settings);
                 return settings ?? settingsCollection;
             }
+
             Log.LogMessage(MessageImportance.Low, $"MSBump settings file \"{settingsFilePath}\" not found");
             return null;
         }
@@ -79,13 +81,14 @@ namespace MSBump
         private bool TryBump(XDocument proj, string tagName, Settings settings)
         {
             // ReSharper disable once PossibleNullReferenceException
-	        var defaultNamespace = proj.Root.GetDefaultNamespace();
-	        var defaultNamespacePrefix = "ns";
-	        var xmlNamespaceManager = new XmlNamespaceManager(new NameTable());
+            var defaultNamespace = proj.Root.GetDefaultNamespace();
+            var defaultNamespacePrefix = "ns";
+            var xmlNamespaceManager = new XmlNamespaceManager(new NameTable());
 
-	        xmlNamespaceManager.AddNamespace(defaultNamespacePrefix, defaultNamespace.NamespaceName);
+            xmlNamespaceManager.AddNamespace(defaultNamespacePrefix, defaultNamespace.NamespaceName);
 
-	        var element = proj.Root.XPathSelectElement($"{defaultNamespacePrefix}:PropertyGroup/{defaultNamespacePrefix}:{tagName}", xmlNamespaceManager);
+            var element = proj.Root.XPathSelectElement(
+                $"{defaultNamespacePrefix}:PropertyGroup/{defaultNamespacePrefix}:{tagName}", xmlNamespaceManager);
 
             if (element == null)
                 return false;
@@ -109,13 +112,7 @@ namespace MSBump
             var labels = oldVersion.ReleaseLabels.ToList();
             if (!string.IsNullOrEmpty(settings.ResetLabel))
             {
-                if (!settings.ResetLabel.All(Char.IsLetterOrDigit))
-                {
-                    Log.LogError(
-                        $"Invalid version label for {GetType().Name}: {settings.ResetLabel} - only alphanumeric characters are allowed");
-                    return false;
-                }
-                var regex = new Regex($"^{settings.ResetLabel}(\\d*)$");
+                var regex = new Regex($"^{Regex.Escape(settings.ResetLabel)}(\\d*)$");
                 foreach (var label in labels)
                 {
                     var match = regex.Match(label);
@@ -126,17 +123,12 @@ namespace MSBump
                     }
                 }
             }
+
             // Find and modify the release label selected with `BumpLabel`
             // If ResetLabel is true, remove only the specified label.
             if (!string.IsNullOrEmpty(settings.BumpLabel) && settings.BumpLabel != settings.ResetLabel)
             {
-                if (!settings.BumpLabel.All(Char.IsLetterOrDigit))
-                {
-                    Log.LogError(
-                        $"Invalid version label for {GetType().Name}: {settings.BumpLabel} - only alphanumeric characters are allowed");
-                    return false;
-                }
-                var regex = new Regex($"^{settings.BumpLabel}(\\d*)$");
+                var regex = new Regex($"^{Regex.Escape(settings.BumpLabel)}(\\d*)$");
                 var value = 0;
                 foreach (var label in labels)
                 {
@@ -149,6 +141,7 @@ namespace MSBump
                         break;
                     }
                 }
+
                 value++;
                 labels.Add(settings.BumpLabel + value.ToString(new string('0', settings.LabelDigits)));
             }
@@ -164,6 +157,7 @@ namespace MSBump
                 GetRequiredPropertyInfo("New" + tagName).SetValue(this, newVersionStr);
                 return true;
             }
+
             return false;
         }
 
@@ -173,8 +167,7 @@ namespace MSBump
                    throw new Exception($"Property {propertyName} is missing from type {GetType().Name}");
         }
 
-        [Required]
-        public string ProjectPath { get; set; }
+        [Required] public string ProjectPath { get; set; }
 
         public string Configuration { get; set; }
 
@@ -200,7 +193,6 @@ namespace MSBump
 
         public int LabelDigits { get; set; } = 6;
 
-        [Output]
-        public string NewVersion { get; set; }
+        [Output] public string NewVersion { get; set; }
     }
 }
