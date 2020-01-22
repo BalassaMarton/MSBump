@@ -24,6 +24,12 @@ dependency version numbers for P2P references in the generated NuGet packages. I
 If updating the NuGet client is not an option, follow these steps:
 1. Turn off "Generate NuGet package on build" in project properties.
 2. Add `dotnet pack --no-build` as a post-build task.
+    * For '.targets' files in multi-target solutions, set the 'AfterTargets' attribute to 'MSBumpAfterOuterBuild':
+		```xml
+		<Target Name="PackForBump" AfterTargets="MSBumpAfterOuterBuild">
+		    <Exec Command="dotnet pack --no-build"/>
+		</Target>
+		```
 After this, all your P2P references in the generated packages should have the correct (bumped) version after building the solution.
 
 ## Settings
